@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Social Media App</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="{% static 'css/all.css' %}" rel="stylesheet">
+  <link href="{% static 'css/blog-home.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">Home page</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="bg bg-dark" style="display: flex; align-items: center; justify-content: space-between; height: 50px; padding: 32px 20px 20px 20px; text-align: center;">
+        <div style="gap: 30px; display: flex; text-align: center; align-items: center;">
+            <p style="font-weight: bold; color: wheat;">You logged in as {{user.username}}</p>
+            <p><a style="text-decoration: none; color: white;" href="{% url 'profile' %}">Your Profile</a></p>
+            <p><a style="text-decoration: none; color: white" href="{% url 'mypost' %}">My Post</a></p>
+            <p><a style="text-decoration: none; color: white" href="{% url 'createpost'%}">Create Post</a></p>
+            <p><a style="text-decoration: none; color: white" href="{% url 'logout' %}">logout</a></p>
+        </div>
+    </div>
+    </div>
+  </nav>
+
+  {% block content %}
+  {% endblock  %}
+
+
+<!-- Footer -->
+<footer class="py-4 bg-dark">
+<div class="container">
+  <p class="m-0 text-center text-white">Copyright &copy; Your Website 2025</p>
+</div>
+<!-- /.container -->
+</footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+{% block script%}{% endblock script%}
+<!-- Bootstrap core JavaScript -->
+
+
+
+
+</body>
+
+</html>

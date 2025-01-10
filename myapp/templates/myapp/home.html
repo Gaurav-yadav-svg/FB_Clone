@@ -1,0 +1,84 @@
+{% extends 'myapp/base.html' %} {% block content %}
+
+<div style="align-items: center; text-align: center; margin-top: 10px">
+  {% for post in object_list %}
+      
+      <p style="font-weight: bold; font-size: 20px">{{post.user.username}}</p>
+      <p>{{post.date}}</p>
+      <a href="{% url 'detailpost' post.pk %}">
+        <div>
+          <img
+            src="{{post.post_img.url}}"
+            alt="Not Showing"
+            width="300"
+            style="margin-bottom: 10px"
+          />
+        </div>
+      </a>
+
+      <!-- <strong style="display: block;" id = "like_count">{{ post.likes.count }}</strong> -->
+
+      {% if request.user.is_authenticated %} {% csrf_token %}
+          <span style="display: block" class="like-count{{post.id}}" id="like_count-{{forloop.counter}}"
+            >{{ post.news_likes_count }}</span
+          >
+          <button class="like-button" value="{{ post.id }}" style="margin: 12px 12px">
+            Like
+          </button>
+      {% endif %}
+
+      <p><strong>{{post.caption}}</strong></p>
+      <hr />
+      {% empty %}
+      <li class="nav-item">No objects Find</li>
+
+  {% endfor %}
+</div>
+
+{% endblock %} {% block script%}
+
+<script>
+  $(document).on("click", ".like-button", function (e) {
+    e.preventDefault();
+    const post_id = $(this).val()
+    console.log(post_id);
+    console.log(e.target);
+    // debugger
+    $.ajax({
+      type: "POST",
+      url: '{% url "like" %}',
+      data: {
+        postid: $(this).val(),
+        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        action: "post",
+      },
+      success: function (json) {
+        console.log(json);
+
+        $(`.like-count${post_id}`).text(json.result)
+      },
+      error: function (xhr, errmsg, err) {},
+    });
+  });
+</script>
+{% endblock script%}
+<!-- <script>
+    $(".like-button").click(function(e){
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "like/",
+        data: {postid: $(this).val(), 
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        action: 'post'},
+        success: function(json){
+          document.getElementById("like_count").innerHTML = json['result']
+        },
+        
+        error: function(xhr, errmsg, err) {
+
+        }
+      });
+    });
+    
+    </script> -->

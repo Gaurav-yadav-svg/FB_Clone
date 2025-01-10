@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2>Your Post</h2>
+    <!-- <h3>{{user.username}} id :- {{user.id}}</h3> -->
+    <a href="{% url 'home' %}">HomePage </a>
+    </div><hr>
+
+        {% for object in userpost %}  
+
+                <p>{{object.date}}</p>
+                <img src= "{{object.post_img.url}}" alt="Not Showing" width="300">
+                <p>{{object.caption}}</p>
+                <a href="{% url 'updatepost' object.pk %}">Edit</a>
+                <a href="{% url 'deletepost' object.pk %}">Delete</a>
+                <hr/>
+        {% empty %}                               
+            <li class="nav-item">No objects Find</li>  
+
+        {% endfor %} 
+        
+</body>
+</html>
+</body>
+</html>
