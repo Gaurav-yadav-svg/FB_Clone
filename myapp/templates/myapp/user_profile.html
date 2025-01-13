@@ -1,24 +1,22 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h2>Profile Page</h2><hr>
-    {% for object in profiledata %}  
+{% extends 'myapp/base.html' %}
+{% block content %}
 
-                <p>{{user.username}}</p>
-                <img src= "{{object.image.url}}" alt="Not Showing">
-                <p>{{object.bio}}</p>
-                <a href="{% url 'updateprofile' object.pk %}">Edit</a>
-                <a href="{% url 'deleteprofile' user.pk %}">Delete</a>
-        {% empty %}                               
-            <li class="nav-item">you did not created you profle<a href="{% url 'createprofile' %}">Create Profile</a></li>  
-
-    {% endfor %} 
-    <a href="{% url 'home' %}">HomePage </a><hr>
-</body>
-</html>
+<div style="align-items: center; text-align: center; margin: 110px 110px; display: flex; justify-content: center;">
+  <div class="card" style="width: 40%; height: 400px; border-radius: 5px;">
+    <div class="card-body" >
+        {% for object in profiledata %}  
+    
+                    <img src= "{{object.image.url}}" alt="Not Showing" width="220">
+                    <p style="font-weight: bold; margin-top: 10px;">{{user.username}}</p>
+                    <p>{{object.bio}}</p>
+                    <a style="font-size: small; font-weight: bold;" class="btn btn-primary"  href="{% url 'updateprofile' object.pk %}">Edit</a>
+                    <a style="font-size: small; font-weight: bold;" class="btn btn-danger" href="{% url 'deleteprofile' user.pk %}">Delete</a>
+            {% empty %}                               
+                <li class="nav-item">you did not created you profle<a href="{% url 'createprofile' %}">Create Profile</a></li>  
+    
+        {% endfor %} 
+    </div>
+  </div>
+  </div>
+   
+{% endblock %}

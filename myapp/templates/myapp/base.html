@@ -20,16 +20,16 @@
 
 </head>
 
-<body>
+<body style="background-color: wheat;">
 
   <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top" style="height: 60px;">
     <div class="container">
-      <a class="navbar-brand" href="{% url 'home' %}">Home page</a>
+      <a class="navbar-brand" href="{% url 'home' %}" style="font-weight: bold;">Social Book</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="bg bg-dark" style="display: flex; align-items: center; justify-content: space-between; height: 50px; padding: 32px 20px 20px 20px; text-align: center;">
+      <div class="bg bg-dark" style="display: flex; align-items: center; justify-content: space-between; height: 50px; padding: 32px 10px 20px 10px; text-align: center; font-size: 15px;">
         <div style="gap: 30px; display: flex; text-align: center; align-items: center;">
             <p style="font-weight: bold; color: wheat;">You logged in as {{user.username}}</p>
             <p><a style="text-decoration: none; color: white;" href="{% url 'profile' %}">Your Profile</a></p>
@@ -46,7 +46,7 @@
 
 
 <!-- Footer -->
-<footer class="py-4 bg-dark">
+<footer class="py-3 bg-dark">
 <div class="container">
   <p class="m-0 text-center text-white">Copyright &copy; Your Website 2025</p>
 </div>
@@ -56,10 +56,5 @@
 <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 {% block script%}{% endblock script%}
 <!-- Bootstrap core JavaScript -->
-
-
-
-
 </body>
-
 </html>

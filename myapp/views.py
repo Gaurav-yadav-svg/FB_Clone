@@ -71,40 +71,11 @@ class Home_Page(ListView):
     success_url = reverse_lazy('home')   
 
     def get_queryset(self): 
-        # import pdb;pdb.set_trace()
-        """Return the last five published questions."""
-        # return Question.objects.order_by("-pub_date")[:5]
-        # return Create_Post.objects.all().order_by("-date")
+    #     # import pdb;pdb.set_trace()
+    #     """Return the last five published questions."""
+    #     # return Question.objects.order_by("-pub_date")[:5]
+        return Create_Post.objects.order_by("-date")
 
-
-def like_post(request):
-    data = json.loads(request.body)
-    print(data)
-    # import pdb;pdb.set_trace()    
-    id = data["id"]
-    post = Create_Post.objects.get(id=id)
-    checker = None
-    print("django Views code")
-    
-    if request.user.is_authenticated:
-        
-        if post.likes.filter(id=request.user.id).exists():
-            post.likes.remove(request.user)
-            checker = 0
-            
-            
-        else:
-            post.likes.add(request.user)
-            checker = 1
-    
-    likes = post.likes.count()
-    
-    info = {
-        "check": checker,
-        "num_of_likes": likes
-    }
-    
-    return JsonResponse(info, safe=False)
 
 @login_required
 def like(request):
@@ -214,8 +185,8 @@ class MyPost(ListView):
 @method_decorator(login_required,name='dispatch')
 class UpdatePost(UpdateView):
     model = Create_Post
+    fields = ["post_img","caption"]
     template_name = 'myapp/update_post.html'
-    fields = ["caption"]
     success_url = reverse_lazy('mypost')
 
 
@@ -226,33 +197,6 @@ class DeletePost(DeleteView):
     model = Create_Post
     success_url = reverse_lazy('mypost')
     template_name = 'myapp/delete_post.html'
-
-
-
-# def PostLike(request,pk):
-#     post = get_object_or_404(Create_Post,id = request.POST.get('post_id'))
-#     if post.likes.filter(id=request.user.id).exists():
-#         post.likes.remove(request.user)
-#     else:
-#         post.likes.add(request.user)
-
-#     return HttpResponseRedirect(reverse('detailpost', args=[str(pk)]))
-
-
-
-
-    # def get_context_data(self, **kwargs):
-    #     # import pdb;pdb.set_trace()
-    #     data = super().get_context_data(**kwargs)
-
-    #     likes_connected = get_object_or_404(Create_Post, id=self.kwargs['pk'])
-    #     liked = False
-    #     if likes_connected.likes.filter(id=self.request.user.id).exists():
-    #         liked = True
-    #     data['number_of_likes'] = likes_connected.number_of_likes()
-    #     data['post_is_liked'] = liked
-    #     return data
-    
 
 
 """Logout Class View"""

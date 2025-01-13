@@ -19,7 +19,6 @@ urlpatterns = [
     path('<int:pk>/updateprofile/',Update_Profile.as_view(),name='updateprofile'),
     path('<int:pk>/deleteprofile/',Delete_Profile.as_view(),name='deleteprofile'),
     path('<int:pk>/detailpost/',Detail_Post.as_view(),name='detailpost'),
-    path("like_post", views.like_post, name="like"),
-    path("like/", views.like, name="like")
+    path("like/", views.like, name="like"),
     
 ]

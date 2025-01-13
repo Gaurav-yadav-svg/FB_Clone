@@ -1,41 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'myapp/base.html' %}
+{% block content %}
+<div style="align-items: center; text-align: center; margin: 15px 15px; display: flex; justify-content: center;">
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h2>Your Post</h2>
     <!-- <h3>{{user.username}} id :- {{user.id}}</h3> -->
-    <a href="{% url 'home' %}">HomePage </a>
-    </div><hr>
+    
+    <div class="card" style="width: 50%;">
+        <div class="card-body">
+            {% for object in userpost %}  
 
-        {% for object in userpost %}  
+                    <p style="font-size: 15px;">{{object.date}}</p>
+                    <img src= "{{object.post_img.url}}" alt="Not Showing" width="500">
+                    <p style="margin-top: 10px;">{{object.caption}}</p>
 
-                <p>{{object.date}}</p>
-                <img src= "{{object.post_img.url}}" alt="Not Showing" width="300">
-                <p>{{object.caption}}</p>
-                <a href="{% url 'updatepost' object.pk %}">Edit</a>
-                <a href="{% url 'deletepost' object.pk %}">Delete</a>
-                <hr/>
-        {% empty %}                               
-            <li class="nav-item">No objects Find</li>  
+                    {% if request.user.is_authenticated %} {% csrf_token %}
+                        <span style="display: block; font-weight: bold;" class="like-count{{object.id}}" id="like_count-{{forloop.counter}}"
+                        >{{ object.news_likes_count }}</span
+                        >
+                        <button class="like-button" value="{{ object.id }}" style="margin: 12px 12px;">
+                        Like
+                        </button>
+                    {% endif %}
+                    <div>
+                        <a style="font-size: small; font-weight: bold;" class="btn btn-primary" href="{% url 'updatepost' object.pk %}">Edit</a>
+                        <a style="font-size: small; font-weight: bold;" class="btn btn-danger" href="{% url 'deletepost' object.pk %}">Delete</a>
+                    </div>
+                    <hr/>
+            {% empty %}                               
+                <li class="nav-item">No objects Find</li>  
 
-        {% endfor %} 
-        
-</body>
-</html>
-</body>
-</html>
+            {% endfor %}
+        </div>
+    </div>
+</div>   
+{% endblock %}
+
+
+{% block script%}
+
+<script>
+  $(document).on("click", ".like-button", function (e) {
+    e.preventDefault();
+    const post_id = $(this).val()
+    console.log(post_id);
+    console.log(e.target);
+    // debugger
+    $.ajax({
+      type: "POST",
+      url: '{% url "like" %}',
+      data: {
+        postid: $(this).val(),
+        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        action: "post",
+      },
+      success: function (json) {
+        console.log(json);
+
+        $(`.like-count${post_id}`).text(json.result)
+      },
+      error: function (xhr, errmsg, err) {},
+    });
+  });
+</script>
+{% endblock script%}
