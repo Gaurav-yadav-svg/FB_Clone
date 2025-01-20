@@ -9,10 +9,95 @@
                     <img src= "{{object.image.url}}" alt="Not Showing" width="220">
                     <p style="font-weight: bold; margin-top: 10px;">{{user.username}}</p>
                     <p>{{object.bio}}</p>
-                    <a style="font-size: small; font-weight: bold;" class="btn btn-primary"  href="{% url 'updateprofile' object.pk %}">Edit</a>
-                    <a style="font-size: small; font-weight: bold;" class="btn btn-danger" href="{% url 'deleteprofile' user.pk %}">Delete</a>
+                    <!-- <a style="font-size: small; font-weight: bold;" class="btn btn-primary"  href="{% url 'updateprofile' object.pk %}">Edit</a> -->
+
+
+                    <button  class="update" value="{{ object.id }} " style="border: none;" data-url = "{% url 'updateprofile' object.pk %}">
+                      <a style="font-size: small; font-weight: bold" class="update{{object.id}} btn btn-primary" data-toggle="modal" data-target = "#Modalupdate">Edit</a>
+                    </button>
+
+
+                    <div class="modal fade" tabindex="-1" id="Modalupdate">
+                      <div class="modal-dialog">
+              
+                          
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">Edit Profile</h5>
+                              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" >
+                                
+                              
+                                
+                            </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type ="submit" form="update_profile"  class="btn btn-primary">Save Changes</button>
+                              </div>
+                            </div>
+                          
+                        </div>
+                      </div>
+
+
+
+                    <!-- <a style="font-size: small; font-weight: bold;" class="btn btn-danger" href="{% url 'deleteprofile' user.pk %}">Delete</a> -->
+
+                    <button  class="delete" value="{{ object.id }} " style="border: none;" data-url = "{% url 'deleteprofile' user.pk %}">
+                      <a style="font-size: small; font-weight: bold" class="update{{object.id}} btn btn-danger" data-toggle="modal" data-target = "#confirmModal">Delete</a>
+                    </button>
+
+                    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="confirmModalLabel">Confirm Deletion</h5>
+                                  <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body text-center">
+                                  
+                              </div>
+                              <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                          <i class="fas fa-times me-2"></i>Cancel
+                                      </button>
+                                  <button type="submit" class="btn btn-danger" form="delete_profile">
+                                          <i class="fas fa-trash-alt me-2"></i>Delete
+                                      </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+            
+
             {% empty %}                               
-                <li class="nav-item">you did not created you profle<a href="{% url 'createprofile' %}">Create Profile</a></li>  
+                <p>you did not created you profle<a style="cursor: pointer;" data-url="{% url 'createprofile' %}" data-toggle="modal" data-target = "#Modalcreateprofile" class="createp">Create Profile</a></p>
+
+                <div class="modal fade" tabindex="-1" id="Modalcreateprofile">
+                  <div class="modal-dialog">  
+                
+                      
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Create Profile</h5>
+                          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" >
+                            
+                          
+                            
+                        </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type ="submit" form="create_profile"  class="btn btn-primary">Create</button>
+                          </div>
+                      </div>
+                
+                    </div>
+                  </div>
+                
     
         {% endfor %} 
     </div>
@@ -20,3 +105,87 @@
   </div>
    
 {% endblock %}
+{% block script%}
+<script>
+  $(document).on("click", ".update", function(e) {
+      
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+    }
+  )}
+  )
+
+// AJAX for delete profile!!!
+
+
+$(document).on("click", ".delete", function(e) {
+    
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+     }
+  )}
+)
+
+$(document).on("click", ".createp", function(e) {
+
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+     }
+  )}
+)
+</script>
+{% endblock script%}

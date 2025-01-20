@@ -43,3 +43,10 @@ class Profile(models.Model):
             
             # overwrite the large image
             img.save(self.image.path)
+
+
+class Comment(models.Model):
+  post = models.ForeignKey(Create_Post, on_delete=models.CASCADE, related_name='comments')
+  name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_by')
+  body = models.TextField(help_text='Add a comment')
+  date = models.DateTimeField(auto_now_add=True)

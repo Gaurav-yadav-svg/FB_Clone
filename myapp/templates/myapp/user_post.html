@@ -1,47 +1,108 @@
-{% extends 'myapp/base.html' %}
-{% block content %}
-<div style="align-items: center; text-align: center; margin: 15px 15px; display: flex; justify-content: center;">
+{% extends 'myapp/base.html' %} {% block content %}
+<div style="
+    align-items: center;
+    text-align: center;
+    margin: 15px 15px;
+    display: flex;
+    justify-content: center;
+  ">
+  <!-- <h3>{{user.username}} id :- {{user.id}}</h3> -->
 
-    <!-- <h3>{{user.username}} id :- {{user.id}}</h3> -->
-    
-    <div class="card" style="width: 50%;">
-        <div class="card-body">
-            {% for object in userpost %}  
+  <div class="card" style="width: 50%">
+    <div class="card-body">
+      {% for object in userpost %}
 
-                    <p style="font-size: 15px;">{{object.date}}</p>
-                    <img src= "{{object.post_img.url}}" alt="Not Showing" width="500">
-                    <p style="margin-top: 10px;">{{object.caption}}</p>
+              <p style="font-size: 15px">{{object.date}}</p>
+              <img src="{{object.post_img.url}}" alt="Not Showing" width="500" />
+              <p style="margin-top: 10px">{{object.caption}}</p>
 
-                    {% if request.user.is_authenticated %} {% csrf_token %}
-                        <span style="display: block; font-weight: bold;" class="like-count{{object.id}}" id="like_count-{{forloop.counter}}"
-                        >{{ object.news_likes_count }}</span
-                        >
-                        <button class="like-button" value="{{ object.id }}" style="margin: 12px 12px;">
-                        Like
-                        </button>
-                    {% endif %}
-                    <div>
-                        <a style="font-size: small; font-weight: bold;" class="btn btn-primary" href="{% url 'updatepost' object.pk %}">Edit</a>
-                        <a style="font-size: small; font-weight: bold;" class="btn btn-danger" href="{% url 'deletepost' object.pk %}">Delete</a>
+              {% if request.user.is_authenticated %} {% csrf_token %}
+              <span style="display: block; font-weight: bold" class="like-count{{object.id}}"
+                id="like_count-{{forloop.counter}}">{{ object.news_likes_count }}</span>
+                
+              <button  class="like-button" value="{{ object.id }}"style="margin: 12px 12px">
+                <small class="like-button{{object.id}}">like</small>
+              </button>
+
+
+              {% endif %}
+              
+              <div style="display: flex; justify-content: center; gap: 7px">
+
+                <button  class="update" value="{{ object.id }} " style="border: none;" data-url = "{% url 'updatepost' object.pk %}">
+                  <a style="font-size: small; font-weight: bold" class="update{{object.id}} btn btn-primary" data-toggle="modal" data-target = "#Modalupdate">Edit</a>
+                </button>
+
+               
+                  <div class="modal fade" tabindex="-1" id="Modalupdate">
+                    <div class="modal-dialog">
+            
+                        
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Edit Post</h5>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body" >
+                              
+                            
+                              
+                          </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <button type ="submit" form="update_form"  class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+              
+                      </div>
                     </div>
-                    <hr/>
-            {% empty %}                               
-                <li class="nav-item">No objects Find</li>  
 
-            {% endfor %}
-        </div>
-    </div>
-</div>   
-{% endblock %}
+                  <!-- <a style="font-size: small; font-weight: bold" class="btn btn-danger"
+                  href="{% url 'deletepost' object.pk %}">Delete</a> -->
+
+                <button  class="delete" value="{{ object.id }} " style="border: none;" data-url = "{% url 'deletepost' object.pk %}">
+                  <a style="font-size: small; font-weight: bold" class="update{{object.id}} btn btn-danger" data-toggle="modal" data-target = "#confirmModal">Delete</a>
+                </button>
 
 
-{% block script%}
+                <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="confirmModalLabel">Confirm Deletion</h5>
+                              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body text-center">
+                              
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                      <i class="fas fa-times me-2"></i>Cancel
+                                  </button>
+                              <button type="submit" class="btn btn-danger" form="delete_post">
+                                      <i class="fas fa-trash-alt me-2"></i>Delete
+                                  </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+                  
+
+              </div>
+            <hr />
+            {% empty %}
+            <li class="nav-item">No objects Find</li>
+
+    {% endfor %}
+  </div>
+</div>
+</div>
+{% endblock %} {% block script%}
 
 <script>
   $(document).on("click", ".like-button", function (e) {
     e.preventDefault();
-    const post_id = $(this).val()
-    console.log(post_id);
+    const post_id = $(this).val();
     console.log(e.target);
     // debugger
     $.ajax({
@@ -54,11 +115,99 @@
       },
       success: function (json) {
         console.log(json);
+        if(json["check"] == 1){
+          $(`.like-button${post_id}`).html("dislike")
+      }
 
-        $(`.like-count${post_id}`).text(json.result)
+        else if(json["check"] == 0){
+          $(`.like-button${post_id}`).html("like")
+      }
+
+        $(`.like-count${post_id}`).text(json.result);
       },
-      error: function (xhr, errmsg, err) {},
+      error: function (xhr, errmsg, err) { },
     });
   });
+
+  $(document).on("click", ".update", function(e) {
+    
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+     }
+  )}
+)
+
+
+
+// AJAX for delete post!!!
+
+
+$(document).on("click", ".delete", function(e) {
+    
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+     }
+  )}
+)
+
+// $(document).on("submit", "#updateform" ,function(e){
+//   e.preventDefault()
+//   console.log("running")
+//   const form = $(this)
+//   console.log(form);
+  
+//   const url = $(this).attr("action")
+//   const formdata = form.serialize()
+
+//   $.ajax({
+//     type:POST,
+//     url:url,
+//     data : formdata,
+//     success:function(response){
+//       console.log(response);      
+//       if (response.success){
+//         $("#Modalupdate".modal(response))
+//         location.reload()
+//       }
+//     } 
+//   })
+// })
+
 </script>
-{% endblock script%}
+{% endblock script%}  

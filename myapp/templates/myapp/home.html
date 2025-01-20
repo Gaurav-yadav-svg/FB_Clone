@@ -1,5 +1,28 @@
 {% extends 'myapp/base.html' %} {% block content %}
 
+<div class="modal fade" tabindex="-1" id="Modalcreatepost">
+  <div class="modal-dialog">
+
+      
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Post</h5>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" >
+            
+          
+            
+        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type ="submit" form="create_post"  class="btn btn-primary">Add</button>
+          </div>
+      </div>
+
+    </div>
+  </div>
+
 <div style="align-items: center; text-align: center; margin: 15px 15px; display: flex; justify-content: center;">
   <div class="card" style="width: 50%;">
     <div class="card-body">
@@ -27,8 +50,9 @@
               >{{ post.news_likes_count }}</span
             >
             <button class="like-button" value="{{ post.id }}" style="margin: 12px 12px">
-              Like
+              <small class="like-button{{post.id}}">like</small>
             </button>
+
         {% endif %}
 
         <p><strong>{{post.caption}}</strong></p>
@@ -60,11 +84,57 @@
       success: function (json) {
         console.log(json);
 
-        $(`.like-count${post_id}`).text(json.result)
+      if(json["check"] == 1){
+          $(`.like-button${post_id}`).html("dislike")
+      }
+
+        else if(json["check"] == 0){
+          $(`.like-button${post_id}`).html("like")
+      }
+
+      $(`.like-count${post_id}`).text(json.result)
+      
       },
       error: function (xhr, errmsg, err) {},
     });
   });
+
+
+
+
+  $(document).on("click", ".create", function(e) {
+    
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+     }
+  )}
+)
+
+
+
+// AJAX for delete post!!!
+
+     
+
+
 </script>
 {% endblock script%}
 <!-- <script>

@@ -43,7 +43,6 @@ class LogIn(View):
                 user = authenticate(username=usern,password=passw)
                 if user is not None:
                     login(request,user)
-                    messages.success(request,"You Successfully Loged in.")
                     return redirect('home')
                 else:
                     messages.error(request,'invalid user')
@@ -91,6 +90,7 @@ def like(request):
         if posts.likes.filter(id=request.user.id).exists():
             posts.likes.remove(request.user)
             posts.news_likes_count -= 1
+            checker = 0
             if posts.news_likes_count <= 0:
                 posts.news_likes_count = 0
             result = posts.news_likes_count
@@ -98,10 +98,17 @@ def like(request):
         else:
             posts.likes.add(request.user)
             posts.news_likes_count += 1
+            checker = 1
             result = posts.news_likes_count
             posts.save()
         # ctx = {'result': result}
-        return JsonResponse({'result': result})
+
+        info = {
+            "check" :checker,
+            'result': result
+        }
+
+        return JsonResponse(info)
         # return HttpResponse(json.dumps(ctx), content_type='application/json')
         
 
@@ -162,7 +169,7 @@ class create_user_post(CreateView):
     model = Create_Post
     template_name = "myapp/create_post.html"
     success_url = reverse_lazy('home')
-
+    
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
@@ -184,12 +191,20 @@ class MyPost(ListView):
 """Update User Post Class View"""   
 @method_decorator(login_required,name='dispatch')
 class UpdatePost(UpdateView):
+    # import pdb;pdb.set_trace()
     model = Create_Post
     fields = ["post_img","caption"]
     template_name = 'myapp/update_post.html'
     success_url = reverse_lazy('mypost')
 
+    # def get_form(self, form_class = Create_Post):
+    #     return JsonResponse( form_class, safe=False)
 
+    # def form_valid(self, form):
+    #     form.instance.user = self.request.user
+    #     return JsonResponse({'success':True})
+
+    
 
 """Delete User Post Class View"""
 @method_decorator(login_required,name='dispatch')
