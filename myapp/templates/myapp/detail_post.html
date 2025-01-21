@@ -12,7 +12,13 @@
     {% if user.is_authenticated %}
     {% csrf_token %}     
         <span style="display: block; font-weight: bold; margin-top: 10px;" class="" id="like_count">{{ object.news_likes_count }}</span>
-        <button class="like-button" value="{{ object.id }}" style="margin: 12px 12px;"> Like </button>
+        <button class="like-button" value="{{ object.id }}" style="margin: 12px 12px;"> 
+          {% if request.user in object.likes.all %}
+            dislike
+          {% else %}
+            like
+          {% endif %}
+        </button>
   {% endif %}
     <p>{{object.caption}}</p>
     </div>

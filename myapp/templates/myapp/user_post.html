@@ -21,7 +21,13 @@
                 id="like_count-{{forloop.counter}}">{{ object.news_likes_count }}</span>
                 
               <button  class="like-button" value="{{ object.id }}"style="margin: 12px 12px">
-                <small class="like-button{{object.id}}">like</small>
+                <small class="like-button{{object.id}}">
+                  {%if request.user in object.likes.all%}
+                    dislike
+                  {% else %}
+                    like
+                  {% endif %}
+                </small>
               </button>
 
 

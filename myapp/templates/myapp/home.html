@@ -50,7 +50,13 @@
               >{{ post.news_likes_count }}</span
             >
             <button class="like-button" value="{{ post.id }}" style="margin: 12px 12px">
-              <small class="like-button{{post.id}}">like</small>
+              <small class="like-button{{post.id}}">
+                {%if request.user in post.likes.all%}
+                  dislike
+                {% else %}
+                  like
+                {% endif %}
+              </small>
             </button>
 
         {% endif %}
