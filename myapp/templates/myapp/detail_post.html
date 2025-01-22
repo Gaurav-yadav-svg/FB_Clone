@@ -2,25 +2,52 @@
 {% block content %}
     <!-- style="color :red;" -->
     <div style="align-items: center; text-align: center; margin: 15px 15px; display: flex; justify-content: center;">
-      <div class="card" style="width: 45%; height: 513px;">
+      <div class="card" style="width: 45%; height: 60em;">
         <div class="card-body">
         <h2> Post Detail</h2>
 
-    <p style="font-weight : bold; font-size: 20px; " >{{object.user.username}}</p>
-    <img src= "{{object.post_img.url}}" alt="Not Showing" width="400" >
+      <p style="font-weight : bold; font-size: 20px; " >{{object.user.username}}</p>
+      <img src= "{{object.post_img.url}}" alt="Not Showing" width="400" >
 
-    {% if user.is_authenticated %}
-    {% csrf_token %}     
-        <span style="display: block; font-weight: bold; margin-top: 10px;" class="" id="like_count">{{ object.news_likes_count }}</span>
-        <button class="like-button" value="{{ object.id }}" style="margin: 12px 12px;"> 
-          {% if request.user in object.likes.all %}
-            dislike
-          {% else %}
-            like
-          {% endif %}
-        </button>
-  {% endif %}
-    <p>{{object.caption}}</p>
+        {% if user.is_authenticated %}
+        {% csrf_token %}     
+            <span style="display: block; font-weight: bold; margin-top: 10px;" class="" id="like_count">{{ object.news_likes_count }}</span>
+            <button class="like-button" value="{{ object.id }}" style="margin: 12px 12px;"> 
+              {% if request.user in object.likes.all %}
+                dislike
+              {% else %}
+                like
+              {% endif %}
+            </button>
+        {% endif %}
+        <p><strong>{{object.caption}}</strong></p><hr>
+
+
+        <p style="display: flex; justify-content: center; font-weight: 450;">Comments</p>
+        {% for comment in object.comments.all %}
+          <div class="comment">
+            <p class="info" style="display: flex; justify-content: left; padding-left:80px;">
+              Comment {{ forloop.counter }} by {{ comment.name }}
+              {{ comment.date }}
+            </p>
+            <small style="display: flex; justify-content: left; padding-left:80px;">
+              {{ comment.body|linebreaks }}
+            </small>
+          </div>
+        {% empty %}
+          <p>There are no comments yet.</p>
+        {% endfor %}
+
+
+          <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:82px; margin-top: 25px;">Add comment</small>
+          <form action="{% url 'comm' object.pk %}" method="post">
+            <div style="display: flex; justify-content: center;">
+              {% csrf_token %}
+              {{ form.as_p}}
+              <small><input type="submit" value="post" style="height: 30px;"></small>
+            </div>
+          </form>
+
     </div>
   </div>
 </div>

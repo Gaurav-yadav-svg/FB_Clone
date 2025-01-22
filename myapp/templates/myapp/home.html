@@ -62,7 +62,36 @@
         {% endif %}
 
         <p><strong>{{post.caption}}</strong></p>
+    
+        
+        
+        <p style="display: flex; justify-content: center; font-weight: 450;">Comments</p>
+        {% for comment in post.comments.all %}
+        <div class="comment" style="padding-left: 35px;">
+            <p class="info" style="display: flex; justify-content: left; padding-left:80px;">
+              Comment {{ forloop.counter }} by {{ comment.name }}
+              {{ comment.date }}
+            </p>
+            <small style="display: flex; justify-content: left; padding-left:80px;">
+              {{ comment.body|linebreaks }}
+            </small>
+          </div>
+        {% empty %}
+          <p>There are no comments yet.</p>
+        {% endfor %}
+
+
+        <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:112px; margin-top: 25px;">Add comment</small>
+        <form action="{% url 'homecomment' post.pk %}" method="post">
+          <div style="display: flex; justify-content: center;">
+            {% csrf_token %}
+            {{ form.as_p}}
+            <small><input type="submit" value="post" style="height: 30px;" id="{{post.id}}"></small>
+          </div>
+        </form>
+        
         <hr />
+
         {% empty %}
         <li class="nav-item">No objects Find</li>       
     {% endfor %}
@@ -143,23 +172,3 @@
 
 </script>
 {% endblock script%}
-<!-- <script>
-    $(".like-button").click(function(e){
-      e.preventDefault();
-      $.ajax({
-        type: 'POST',
-        url: "like/",
-        data: {postid: $(this).val(), 
-        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-        action: 'post'},
-        success: function(json){
-          document.getElementById("like_count").innerHTML = json['result']
-        },
-        
-        error: function(xhr, errmsg, err) {
-
-        }
-      });
-    });
-    
-    </script> -->

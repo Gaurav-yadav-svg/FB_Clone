@@ -7,8 +7,8 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .forms import User_Post_Creation,User_Profile_Creation,UserUpdateForm,ProfileUpdateForm
-from .models import Create_Post,Profile
+from .forms import User_Post_Creation,User_Profile_Creation,UserUpdateForm,ProfileUpdateForm,CommentForm
+from .models import Create_Post,Profile,Comment
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
@@ -67,7 +67,7 @@ class sign_up(CreateView):
 class Home_Page(ListView):
     model = Create_Post
     template_name = "myapp/home.html"
-    success_url = reverse_lazy('home')   
+    success_url = reverse_lazy('home')      
 
     def get_queryset(self): 
     #     # import pdb;pdb.set_trace()
@@ -75,18 +75,24 @@ class Home_Page(ListView):
     #     # return Question.objects.order_by("-pub_date")[:5]
         return Create_Post.objects.order_by("-date")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm() # Inject CommentForm
+        return context
 
+
+"""Like and Dislike Function"""
 @login_required
 def like(request):
     if request.POST.get('action') == 'post':
-        print(request.POST)
+        # print(request.POST)
         # print("chlra hai")
         result = ''
-        print("result:-",result)
+        # print("result:-",result)
         id = int(request.POST.get('postid'))
-        print(id)
+        # print(id)
         posts = get_object_or_404(Create_Post, id=id)
-        print(posts)
+        # print(posts)
         if posts.likes.filter(id=request.user.id).exists():
             posts.likes.remove(request.user)
             posts.news_likes_count -= 1
@@ -112,10 +118,52 @@ def like(request):
         # return HttpResponse(json.dumps(ctx), content_type='application/json')
         
 
+"""Detail View for showing one post on single page"""
 class Detail_Post(LoginRequiredMixin,DetailView):
     model = Create_Post
     template_name = 'myapp/detail_post.html'
     context_object_name = 'detaildata'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm() # Inject CommentForm
+        return context
+    
+
+"""Add comment on the post of detail page"""
+@login_required
+def comment(request, pk):
+    post = get_object_or_404(Create_Post, pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        # print(request.POST)
+        if form.is_valid():
+            form.instance.name = request.user
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            return redirect('detailpost', pk=post.pk)
+    else:
+        form = CommentForm()
+    return render(request, 'myapp/detail_post.html', {'form': form})
+
+
+"""Add comment on the posts of Home page"""  
+@login_required
+def AddCommentHome(request, pk):
+    post = get_object_or_404(Create_Post, pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        # print(request.POST)
+        if form.is_valid():
+            form.instance.name = request.user
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            return redirect('home')
+    else:
+        form = CommentForm()
+    return render(request, 'myapp/home.html', {'form': form})
 
 
 
@@ -151,7 +199,6 @@ class Update_Profile(LoginRequiredMixin,UpdateView):
     fields = ["image","bio"]
     template_name = 'myapp/update_profile.html'
     success_url = reverse_lazy('profile')
-
 
 
 """Delete Profiile"""
@@ -197,13 +244,6 @@ class UpdatePost(UpdateView):
     template_name = 'myapp/update_post.html'
     success_url = reverse_lazy('mypost')
 
-    # def get_form(self, form_class = Create_Post):
-    #     return JsonResponse( form_class, safe=False)
-
-    # def form_valid(self, form):
-    #     form.instance.user = self.request.user
-    #     return JsonResponse({'success':True})
-
     
 
 """Delete User Post Class View"""
@@ -212,6 +252,19 @@ class DeletePost(DeleteView):
     model = Create_Post
     success_url = reverse_lazy('mypost')
     template_name = 'myapp/delete_post.html'
+
+
+# class AddComment(CreateView):
+#     model = Comment
+#     form_class = CommentForm
+#     template_name = "myapp/detail_post.html"
+#     success_url = reverse_lazy('/')
+
+#     def form_valid(self, form):
+#         form.instance.name = self.request.user
+#         form.instance.post = self.kwargs.get("id")
+#         return super().form_valid(form)
+
 
 
 """Logout Class View"""

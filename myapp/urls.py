@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import sign_up,LogIn,Logout,Home_Page,create_user_post,MyPost,UpdatePost,DeletePost,User_Profile,Create_Profile,Update_Profile,Delete_Profile,Detail_Post 
+from .views import sign_up,LogIn,Logout,Home_Page,create_user_post,MyPost,UpdatePost,DeletePost,User_Profile,Create_Profile,Update_Profile,Delete_Profile,Detail_Post
 from .import views
 from django.contrib.auth.decorators import login_required
 
@@ -20,5 +20,7 @@ urlpatterns = [
     path('<int:pk>/deleteprofile/',Delete_Profile.as_view(),name='deleteprofile'),
     path('<int:pk>/detailpost/',Detail_Post.as_view(),name='detailpost'),
     path("like/", views.like, name="like"),
-    
+    path("comment/<int:pk>",views.comment,name = "comm"),
+    path("homecomment/<int:pk>",views.AddCommentHome,name = "homecomment"),
+    # path('addcomment/<int:pk>',AddComment.as_view(),name='comm'),
 ]

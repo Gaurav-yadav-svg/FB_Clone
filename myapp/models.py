@@ -48,5 +48,5 @@ class Profile(models.Model):
 class Comment(models.Model):
   post = models.ForeignKey(Create_Post, on_delete=models.CASCADE, related_name='comments')
   name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_by')
-  body = models.TextField(help_text='Add a comment')
+  body = models.TextField()
   date = models.DateTimeField(auto_now_add=True)

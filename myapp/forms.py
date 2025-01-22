@@ -65,4 +65,9 @@ class ProfileUpdateForm(forms.ModelForm):
 
 """Comment form"""
 class CommentForm(forms.ModelForm):
-    body = forms.CharField(widget=forms.TextInput())
+    class Meta:
+        model = Comment
+        fields = ['body']   
+        labels = {
+            "body": ""
+        }
