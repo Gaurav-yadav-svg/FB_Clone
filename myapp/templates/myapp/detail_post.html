@@ -40,7 +40,8 @@
 
 
           <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:82px; margin-top: 25px;">Add comment</small>
-          <form action="{% url 'comm' object.pk %}" method="post">
+
+          <form id="commentform" action = "{% url 'comm' object.pk %}">
             <div style="display: flex; justify-content: center;">
               {% csrf_token %}
               {{ form.as_p}}
@@ -84,5 +85,33 @@
       });
     })
   
+    
+  // comment ajax code
+  $(document).on('submit', '#commentform', function (e) {
+    // console.log(object.pk);
+    const post_id = $(this).val()
+    console.log($(this).attr('action'));
+    
+    console.log(btn);
+    e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: $(this).attr('action'),
+      data: {
+        type : 'post',
+        'comment': $('#commentform textarea').val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        method:'POST'
+      },
+      dataType: 'json',
+      success: function(data){
+        alert("success")
+          // $('.comment').append(data)        
+    }
+  });
+});
+
+
+
   </script>
 {% endblock %}

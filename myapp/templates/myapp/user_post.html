@@ -1,4 +1,30 @@
 {% extends 'myapp/base.html' %} {% block content %}
+<!-- This is create post modal pop upo -->
+<div class="modal fade" tabindex="-1" id="Modalcreatepost">
+  <div class="modal-dialog">
+
+      
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Post</h5>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" >
+            
+          
+            
+        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type ="submit" form="create_post"  class="btn btn-primary">Add</button>
+          </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
 <div style="
     align-items: center;
     text-align: center;
@@ -167,6 +193,32 @@
 
 
 $(document).on("click", ".delete", function(e) {
+    
+    e.preventDefault();
+    // console.log(e.target.val)
+    var btn = $(this);
+    // debugger
+    $.ajax({
+      type : 'get',
+      url: btn.attr("data-url"),
+      dataType:"html",
+      // data : {
+      //   objid: $(this).val(),
+      //   action: "get"
+      // },
+      // beforeSend :function(){
+      //   $('#Modalupdate').modal("show");
+      // },
+      success: function(data){
+        
+        // console.log(json);  
+        $(".modal-body").html(data) 
+      },
+     }
+  )}
+)
+
+$(document).on("click", ".create", function(e) {
     
     e.preventDefault();
     // console.log(e.target.val)
