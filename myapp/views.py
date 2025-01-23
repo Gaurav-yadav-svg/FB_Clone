@@ -133,6 +133,8 @@ class Detail_Post(LoginRequiredMixin,DetailView):
 """Add comment on the post of detail page"""
 @login_required
 def comment(request, pk):
+    print(request)
+    import pdb;pdb.set_trace()
     post = get_object_or_404(Create_Post, pk=pk)
     if request.method == 'POST':
         form = CommentForm(request.POST)
