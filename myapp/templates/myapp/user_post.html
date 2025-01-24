@@ -1,5 +1,7 @@
 {% extends 'myapp/base.html' %} {% block content %}
-<!-- This is create post modal pop upo -->
+
+
+<!-- This is create post modal pop upo
 <div class="modal fade" tabindex="-1" id="Modalcreatepost">
   <div class="modal-dialog">
 
@@ -21,7 +23,7 @@
       </div>
 
     </div>
-  </div>
+  </div> -->
 
 
 
@@ -218,31 +220,31 @@ $(document).on("click", ".delete", function(e) {
   )}
 )
 
-$(document).on("click", ".create", function(e) {
+// $(document).on("click", ".create", function(e) {
     
-    e.preventDefault();
-    // console.log(e.target.val)
-    var btn = $(this);
-    // debugger
-    $.ajax({
-      type : 'get',
-      url: btn.attr("data-url"),
-      dataType:"html",
-      // data : {
-      //   objid: $(this).val(),
-      //   action: "get"
-      // },
-      // beforeSend :function(){
-      //   $('#Modalupdate').modal("show");
-      // },
-      success: function(data){
+//     e.preventDefault();
+//     // console.log(e.target.val)
+//     var btn = $(this);
+//     // debugger
+//     $.ajax({
+//       type : 'get',
+//       url: btn.attr("data-url"),
+//       dataType:"html",
+//       // data : {
+//       //   objid: $(this).val(),
+//       //   action: "get"
+//       // },
+//       // beforeSend :function(){
+//       //   $('#Modalupdate').modal("show");
+//       // },
+//       success: function(data){
         
-        // console.log(json);  
-        $(".modal-body").html(data) 
-      },
-     }
-  )}
-)
+//         // console.log(json);  
+//         $(".modal-body").html(data) 
+//       },
+//      }
+//   )}
+// )
 
 // $(document).on("submit", "#updateform" ,function(e){
 //   e.preventDefault()

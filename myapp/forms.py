@@ -31,7 +31,13 @@ class Sign_Up_Form(UserCreationForm):
         elif User.objects.filter(email=self.cleaned_data['email']).exists():
             raise forms.ValidationError("the given email is already registered")
         return email  
+    
 
+    def UppercaseValidator(self):
+        password1 = self.cleaned_data.get('password1')
+        if not re.search('[A-Z]', password1):
+            raise forms.ValidationError("The password must contain at least 1 uppercase letter, A-Z.")
+        return password1
 
     
 class User_Post_Creation(forms.ModelForm):
