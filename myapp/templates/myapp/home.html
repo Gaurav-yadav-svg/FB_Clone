@@ -1,5 +1,6 @@
 {% extends 'myapp/base.html' %} {% block content %}
 
+
 <div class="modal fade" tabindex="-1" id="Modalcreatepost">
   <div class="modal-dialog">
 
@@ -28,69 +29,79 @@
     <div class="card-body">
     
     
-    {% for post in object_list %}
+      {% for post in object_list %}
+            
+          <p style=" font-weight: bold; font-size: 16px;">{{post.user.username}}</p>
+          <p style="font-size: 15px;">{{post.date}}</p>
+          <a href="{% url 'detailpost' post.pk %}">
+            <div>
+              <img
+                src="{{post.post_img.url}}"
+                alt="Not Showing" 
+                width="500"
+                style="margin-bottom: 10px"
+              />
+            </div>
+          </a>
+
+          <!-- <strong style="display: block;" id = "like_count">{{ post.likes.count }}</strong> -->
+
+          {% if request.user.is_authenticated %} {% csrf_token %}
+              <span style="display: block; font-weight: bold;" class="like-count{{post.id}}" id="like_count-{{forloop.counter}}"
+                >{{ post.news_likes_count }}</span
+              >
+              <button class="like-button" value="{{ post.id }}" style="margin: 12px 12px">
+                <small class="like-button{{post.id}}">
+                  {%if request.user in post.likes.all%}
+                    dislike
+                  {% else %}
+                    like
+                  {% endif %}
+                </small>
+              </button>
+
+          {% endif %}
+
+          <p><strong>{{post.caption}}</strong></p>
+      
           
-        <p style=" font-weight: bold; font-size: 16px;">{{post.user.username}}</p>
-        <p style="font-size: 15px;">{{post.date}}</p>
-        <a href="{% url 'detailpost' post.pk %}">
-          <div>
-            <img
-              src="{{post.post_img.url}}"
-              alt="Not Showing" 
-              width="500"
-              style="margin-bottom: 10px"
-            />
+          
+          <p style="display: flex; justify-content: center; font-weight: 450;">Comments</p> 
+          <div id="comment-list">
+            {% for comment in post.comments.all %}
+              <div class="comment">
+                <p class="info{{post.id}}" style="display: flex; justify-content: left; padding-left:80px;">
+                  Comment by {{ comment.name }}
+                  {{ comment.date }}
+                </p>
+                <small class="small{{post.id}}" style="display: flex; justify-content: space-between ; padding:0px 100px 0px 80px;">
+                  {{ comment.body|linebreaks }}
+                  {% if user == comment.name %}
+                    <p style="color: red; cursor: pointer;" class="delete-comment" data-comid = {{comment.id}}>delete</p>
+                  {% endif %}
+                </small>
+              </div>
+            
+            {% endfor %}
           </div>
-        </a>
 
-        <!-- <strong style="display: block;" id = "like_count">{{ post.likes.count }}</strong> -->
 
-        {% if request.user.is_authenticated %} {% csrf_token %}
-            <span style="display: block; font-weight: bold;" class="like-count{{post.id}}" id="like_count-{{forloop.counter}}"
-              >{{ post.news_likes_count }}</span
-            >
-            <button class="like-button" value="{{ post.id }}" style="margin: 12px 12px">
-              <small class="like-button{{post.id}}">
-                {%if request.user in post.likes.all%}
-                  dislike
-                {% else %}
-                  like
-                {% endif %}
-              </small>
-            </button>
-
-        {% endif %}
-
-        <p><strong>{{post.caption}}</strong></p>
-    
         
-        
-        <p style="display: flex; justify-content: center; font-weight: 450;">Comments</p>
-        {% for comment in post.comments.all %}
-        <div class="comment" style="padding-left: 35px;">
-            <p class="info" style="display: flex; justify-content: left; padding-left:80px;">
-              Comment {{ forloop.counter }} by {{ comment.name }}
-              {{ comment.date }}
-            </p>
-            <small style="display: flex; justify-content: left; padding-left:80px;">
-              {{ comment.body|linebreaks }}
-            </small>
+
+        <div class="post" data-post-id="{{ post.id }}">
+          <div class="comment-list" id="comment-list-{{ post.id }}">
+            <!-- Comments will be loaded here -->
           </div>
-        {% empty %}
-          <p>There are no comments yet.</p>
-        {% endfor %}
+          <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:133px; margin-top: 25px;">Add comment</small>  
+          <form action="{% url 'comm' %}" class="comment-form">
 
-
-        <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:112px; margin-top: 25px;">Add comment</small>
-        <form action="{% url 'homecomment' post.pk %}" method="post">
-          <div style="display: flex; justify-content: center;">
-            {% csrf_token %}
             {{ form.as_p}}
-            <small><input type="submit" value="post" style="height: 30px;" id="{{post.id}}"></small>
-          </div>
-        </form>
-        
-        <hr />
+            <br>
+            <button type="submit" class="submit-comment">Comment</button>
+          </form>
+          
+        </div>
+        <hr/>
 
         {% empty %}
         <li class="nav-item">No objects Find</li>       
@@ -102,6 +113,77 @@
 {% endblock %} {% block script%}
 
 <script>
+
+  function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+  // comment add ajax code
+
+  $(document).on('click', '.submit-comment', function (e) {
+  e.preventDefault();
+  // var comid = $('#comment-list')
+  var url = $('.comment-form').attr("action");
+  let postElement = $(this).closest('.post');
+  let postId = postElement.data('post-id');
+  let commentBody = postElement.find('#id_body').val();
+  const csrftoken = getCookie('csrftoken');
+
+  console.log("url:-",url)
+  console.log("postElement:-",postElement)
+  console.log("commentBody:-",commentBody)
+  console.log(postId);
+
+
+  $.ajax({
+      method: "POST",
+      url: url, 
+      headers: { 'X-CsrfToken': csrftoken },
+      data: JSON.stringify({ post_id: postId, body: commentBody }),
+      success: function (data) {
+          let comments = data.com_data_particular;
+         
+          postElement.find('#id_body').val('');
+          
+          let commentList = postElement.find('.comment-list');
+          commentList.html('');
+          comments.forEach(comment => {
+            let commentHTML = `
+            <div class="comment">
+              <p class="info" style="display: flex; justify-content: left; padding-left:80px;">Comment by ${comment.name__username} on ${new Date(comment.date).toLocaleString()}</p>
+              <small style="display: flex; justify-content: space-between ; padding:0px 100px 0px 80px;">
+                ${ comment.body}
+                
+                
+                <p style="color: red; cursor: pointer;" class="delete-comment" data-comid = ${comment.id}>delete</p>
+                </small>
+                </div>
+                `;
+                commentList.append(commentHTML);
+              // comid.append(commentHTML)
+
+          });
+      },
+      error: function (xhr, errmsg, err) {
+          console.log("Error:", errmsg);
+      }
+  });
+});
+
+
+
   $(document).on("click", ".like-button", function (e) {
     e.preventDefault();
     const post_id = $(this).val()
@@ -164,11 +246,87 @@
 )
 
 
-
-// AJAX for delete post!!!
+    // ajax delete comment code
+    $(document).on('click', '.delete-comment', function (e) {
+      console.log("Delete button was clicked")
+      let id = $(this).attr("data-comid")
+      mydata = {cid:id}
+      mythis = $(this)
+      const csrftoken = getCookie('csrftoken');
+      
+      $.ajax({
+        url : "{% url 'delcomment' %}",
+        method : "POST",
+        data : mydata,
+        headers: {'X-CsrfToken': csrftoken},
+        success: function(data){
+          console.log(data);
+          if(data.status == 1){
+            console.log("Comment Deleted.")
+            $(mythis).closest('div').fadeOut();
+          }
+          if(data.status == 0){
+            console.log("Comment was unable to deleted.")
+          }
+        }
+      })
+    });
 
      
 
 
 </script>
 {% endblock script%}
+
+
+
+
+<!-- <div class="post" data-post-id="{{ post.id }}">
+  <div class="comment-list" id="comment-list-{{ post.id }}">
+    Comments will be loaded here
+  </div>
+  <textarea class="comment-body"></textarea>
+  <button class="submit-comment">Comment</button>
+  
+</div> -->
+
+
+<script>
+// Add comment via AJAX
+// $(document).on('click', '.submit-comment', function (e) {
+//   e.preventDefault();
+//   // Get the post ID and comment body dynamically
+//   let postElement = $(this).closest('.post');
+//   let postId = postElement.data('post-id');
+//   let commentBody = postElement.find('.comment-body').val();
+//   const csrftoken = getCookie('csrftoken');
+//   $.ajax({
+//       method: "POST",
+//       url: "/add-comment/", // Replace with your actual URL
+//       headers: { 'X-CsrfToken': csrftoken },
+//       data: JSON.stringify({ post_id: postId, body: commentBody }),
+//       success: function (data) {
+//           let comments = data.com_data_particular;
+//           // Clear the comment input field
+//           postElement.find('.comment-body').val('');
+//           // Clear and reload comments for the current post
+//           let commentList = postElement.find('.comment-list');
+//           commentList.html(''); // Clear old comments
+//           comments.forEach(comment => {
+//               let commentHTML = `
+//                   <div class="comment">
+//                       <p>Comment by ${comment.name__username} on ${new Date(comment.date).toLocaleString()}</p>
+//                       <p>${comment.body}</p>
+//                       <p class="delete-comment" style="cursor: pointer; color: red;" data-comid="${comment.id}">Delete</p>
+//                   </div>
+//               `;
+//               commentList.append(commentHTML);
+//           });
+//       },
+//       error: function (xhr, errmsg, err) {
+//           console.log("Error:", errmsg);
+//       }
+//   });
+// });
+
+</script>

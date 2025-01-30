@@ -1,13 +1,13 @@
 from django.urls import path
-from .views import sign_up,LogIn,Logout,Home_Page,create_user_post,MyPost,UpdatePost,DeletePost,User_Profile,Create_Profile,Update_Profile,Delete_Profile,Detail_Post
+from .views import sign_up,LogIn,Logout,Home_Page,create_user_post,MyPost,UpdatePost,DeletePost,User_Profile,Create_Profile,Update_Profile,Delete_Profile,Detail_Post,MyPasswordChangeView,MyPasswordResetDoneView
 from .import views
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
 
     path('',Home_Page.as_view(),name='home'),
-    path('register/',sign_up.as_view(),name='signup'),
+    path('accounts/signup/',sign_up.as_view(),name='signup'),
     path('accounts/login/',LogIn.as_view(),name='login'),
     path('logout/',Logout.as_view(),name='logout'),
     path('createpost/',create_user_post.as_view(),name='createpost'),
@@ -20,7 +20,20 @@ urlpatterns = [
     path('<int:pk>/deleteprofile/',Delete_Profile.as_view(),name='deleteprofile'),
     path('<int:pk>/detailpost/',Detail_Post.as_view(),name='detailpost'),
     path("like/", views.like, name="like"),
-    path("comment/<int:pk>",views.comment,name = "comm"),
-    path("homecomment/<int:pk>",views.AddCommentHome,name = "homecomment"),
+    path("comment/",views.comment_create,name = "comm"),
+    # path("homecomment/<int:pk>",views.AddCommentHome,name = "homecomment"),
+    path("delete-comment/",views.Delete_Comment,name = "delcomment"),
     # path('addcomment/<int:pk>',AddComment.as_view(),name='comm'),
+
+    path("reset_password/",auth_views.PasswordResetView.as_view(),name = "reset_password"),
+
+    path("reset_password_sent/",auth_views.PasswordResetDoneView.as_view(),name = "password_reset_done"),
+
+    path("reset/<uidb64>/<token>/",auth_views.PasswordResetConfirmView.as_view(),name = "password_reset_confirm"),
+
+    path("reset_password_complete/",auth_views.PasswordResetCompleteView.as_view(),name = "password_reset_complete"),
+
+
+    path("change-password/",MyPasswordChangeView.as_view(),name = "password-change-view"),
+    path("change-password/done/",MyPasswordResetDoneView.as_view(),name = "password-change-done-view"),   
 ]

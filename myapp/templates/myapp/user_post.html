@@ -1,4 +1,4 @@
-{% extends 'myapp/base.html' %} {% block content %}
+{% extends 'myapp/index.html' %} {% block content %}
 
 
 <!-- This is create post modal pop upo
@@ -36,7 +36,7 @@
   ">
   <!-- <h3>{{user.username}} id :- {{user.id}}</h3> -->
 
-  <div class="card" style="width: 50%">
+  <div class="card" style="width: 50%; height: 100%;">
     <div class="card-body">
       {% for object in userpost %}
 
@@ -125,7 +125,8 @@
               </div>
             <hr />
             {% empty %}
-            <li class="nav-item">No objects Find</li>
+            <li class="nav-item">No posts Find</li>
+            
 
     {% endfor %}
   </div>

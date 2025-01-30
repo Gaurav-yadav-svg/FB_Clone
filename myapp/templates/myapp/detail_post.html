@@ -1,4 +1,5 @@
-{% extends 'myapp/base.html'%}
+{% extends 'myapp/index.html'%}
+
 {% block content %}
     <!-- style="color :red;" -->
     <div style="align-items: center; text-align: center; margin: 15px 15px; display: flex; justify-content: center;">
@@ -8,7 +9,7 @@
 
       <p style="font-weight : bold; font-size: 20px; " >{{object.user.username}}</p>
       <img src= "{{object.post_img.url}}" alt="Not Showing" width="400" >
-
+          
         {% if user.is_authenticated %}
         {% csrf_token %}     
             <span style="display: block; font-weight: bold; margin-top: 10px;" class="" id="like_count">{{ object.news_likes_count }}</span>
@@ -22,31 +23,39 @@
         {% endif %}
         <p><strong>{{object.caption}}</strong></p><hr>
 
+        
 
         <p style="display: flex; justify-content: center; font-weight: 450;">Comments</p>
-        {% for comment in object.comments.all %}
-          <div class="comment">
-            <p class="info" style="display: flex; justify-content: left; padding-left:80px;">
-              Comment {{ forloop.counter }} by {{ comment.name }}
-              {{ comment.date }}
-            </p>
-            <small style="display: flex; justify-content: left; padding-left:80px;">
-              {{ comment.body|linebreaks }}
-            </small>
-          </div>
-        {% empty %}
-          <p>There are no comments yet.</p>
-        {% endfor %}
+        <div id="comment-list">
+            {% for comment in object.comments.all %}
+              <div class="comment">
+                <p class="info" style="display: flex; justify-content: left; padding-left:80px;">
+                  Comment by {{ comment.name }}
+                  {{ comment.date }}
+                </p>
+                <small style="display: flex; justify-content: space-between ; padding:0px 100px 0px 80px;">
+                  {{ comment.body|linebreaks }}
+                  {% if user == comment.name %}
+                    <p style="color: red; cursor: pointer;" class="delete-comment" data-comid = {{comment.id}}>delete</p>
+                  {% endif %}
+                </small>
+              </div>
+            {% empty %}
+              <p>There are no comments yet.</p>
+            {% endfor %}
+        </div>
 
 
           <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:82px; margin-top: 25px;">Add comment</small>
 
-          <form id="commentform" action = "{% url 'comm' object.pk %}">
-            <div style="display: flex; justify-content: center;">
-              {% csrf_token %}
-              {{ form.as_p}}
-              <small><input type="submit" value="post" style="height: 30px;"></small>
-            </div>
+
+          <form action="{% url 'comm' %}" id="comment-form">
+            <input type="hidden" id="post-id" value="{{object.id}}">
+            <!-- <textarea id="comment-body" maxlength="255" rows="4" cols="50"></textarea>{{ form.as_p}} -->
+            <!-- textarea id is id_textarea -->
+            {{ form.as_p}}
+            <br>
+            <button type="submit" class="submit-comment">Comment</button>
           </form>
 
     </div>
@@ -54,9 +63,108 @@
 </div>
 
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
 
+
+  function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Add comment in post ajax code
+  $('.submit-comment').click( function (e) {
+        e.preventDefault();
+        
+        let output = ""
+        var url = $('#comment-form').attr("action");
+        var post_id = $('#post-id').attr("value");
+        var body = $('#id_body').val();
+        const csrftoken = getCookie('csrftoken');
+
+        console.log("url:-",url)
+        console.log("postID:-",post_id)
+        console.log("body:-",body)
+
+        $.ajax({
+            method: "POST",
+            url: url,
+            headers: {'X-CsrfToken': csrftoken},
+            data: JSON.stringify({ post_id: post_id, body: body }),
+            
+
+            success: function(data) {
+              console.log(data.com_data_particular);
+              
+              $('#id_body').val('');
+              let comments = data.com_data_particular
+              
+              $('#comment-list').html('')
+
+              comments.forEach(comment => {
+                // console.log("this is my com",comment);
+                
+                let commentHTML = 
+                `<div class= "comment">
+                    <p class="info" style="display: flex; justify-content: left; padding-left:80px;">
+                      Comment by ${comment.name__username} ${new Date(comment.date).toLocaleString()}.
+                    </p>
+                    <small style="display: flex; justify-content: space-between ; padding:0px 100px 0px 80px;">
+                      ${ comment.body}
+                      
+                        <p style="color: red; cursor: pointer;" class="delete-comment" data-comid = ${comment.id}>delete</p>
+
+                    </small>
+                  </div>
+                `;
+                $("#comment-list").append(commentHTML);
+              });
+            }
+        });
+    });
+
+
+
+
+    // ajax delete comment code
+    $("#comment-list").on('click', '.delete-comment', function (e) {
+      console.log("Delete button was clicked")
+      let id = $(this).attr("data-comid")
+      mydata = {cid:id}
+      mythis = $(this)
+      const csrftoken = getCookie('csrftoken');
+      
+      $.ajax({
+        url : "{% url 'delcomment' %}",
+        method : "POST",
+        data : mydata,
+        headers: {'X-CsrfToken': csrftoken},
+        success: function(data){
+          console.log(data);
+          if(data.status == 1){
+            console.log("Comment Deleted.")
+            $(mythis).closest('div').fadeOut();
+          }
+          if(data.status == 0){
+            console.log("Comment was unable to deleted.")
+          }
+        }
+      })
+    });
+
+
+    // like button ajax code
     $(document).on('click', '.like-button', function (e) {
       e.preventDefault();
       $.ajax({
@@ -86,32 +194,22 @@
     })
   
     
-  // comment ajax code
-  $(document).on('submit', '#commentform', function (e) {
-    // console.log(object.pk);
-    const post_id = $(this).val()
-    console.log($(this).attr('action'));
-    
-    console.log(btn);
-    e.preventDefault();
-    $.ajax({
-      type: 'POST',
-      url: $(this).attr('action'),
-      data: {
-        type : 'post',
-        'comment': $('#commentform textarea').val(),
-        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-        method:'POST'
-      },
-      dataType: 'json',
-      success: function(data){
-        alert("success")
-          // $('.comment').append(data)        
-    }
-  });
-});
-
-
+  
 
   </script>
 {% endblock %}
+
+
+
+
+
+<!-- console.log(data)
+$('#comment-div').prop("hidden", true);  
+$('#id_body').val('');
+$('#comment-list').append(
+`<p>commented:</p> 
+<p>${comment.body}</p>`
+); 
+x = data.com_data
+for (i = 0, i < x.length, i++){    
+} -->

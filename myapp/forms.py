@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 from django.contrib.auth.models import User
 from .models import Create_Post,Profile,Comment
 
+
 class Login_User_Form(AuthenticationForm):
     class Meta:
         fields = ['username','password']
@@ -31,13 +32,6 @@ class Sign_Up_Form(UserCreationForm):
         elif User.objects.filter(email=self.cleaned_data['email']).exists():
             raise forms.ValidationError("the given email is already registered")
         return email  
-    
-
-    def UppercaseValidator(self):
-        password1 = self.cleaned_data.get('password1')
-        if not re.search('[A-Z]', password1):
-            raise forms.ValidationError("The password must contain at least 1 uppercase letter, A-Z.")
-        return password1
 
     
 class User_Post_Creation(forms.ModelForm):
@@ -48,22 +42,26 @@ class User_Post_Creation(forms.ModelForm):
 
 
 class User_Profile_Creation(forms.ModelForm):
+
     class Meta:
         model = Profile
         fields = ['image','bio']
 
 
 
-class UserUpdateForm(forms.ModelForm):
-    email = forms.EmailField()
+# class UserUpdateForm(forms.ModelForm):
+#     email = forms.EmailField()
  
-    class Meta:
-        model = User
-        fields = ['first_name','last_name','username', 'email']
+#     class Meta:
+#         model = User
+#         fields = ['first_name','last_name','username', 'email']
  
  
 
 class ProfileUpdateForm(forms.ModelForm):
+    username = forms.CharField(max_length=50)
+    first_name = forms.CharField(max_length=50)
+    last_name = forms.CharField(max_length=50)
     class Meta:
         model = Profile
         fields = ['image','bio']

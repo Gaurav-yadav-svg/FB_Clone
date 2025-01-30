@@ -1,8 +1,8 @@
-{% extends 'myapp/base.html' %}
+{% extends 'myapp/index.html' %}
 {% block content %}
 
 <!-- This is create post modal pop upo -->
-<div class="modal fade" tabindex="-1" id="Modalcreatepost">
+<!-- <div class="modal fade" tabindex="-1" id="Modalcreatepost">
   <div class="modal-dialog">
 
       
@@ -23,7 +23,7 @@
       </div>
 
     </div>
-  </div>
+  </div> -->
 
 
 
@@ -99,7 +99,7 @@
             
 
             {% empty %}                               
-                <p>you did not created you profle<a style="cursor: pointer;" data-url="{% url 'createprofile' %}" data-toggle="modal" data-target = "#Modalcreateprofile" class="createp">Create Profile</a></p>
+                <p>you did not created your profile<a style="cursor: pointer;" data-url="{% url 'createprofile' %}" data-toggle="modal" data-target = "#Modalcreateprofile" class="createp">Create Profile</a></p>
 
                 <div class="modal fade" tabindex="-1" id="Modalcreateprofile">
                   <div class="modal-dialog">  
@@ -215,30 +215,30 @@ $(document).on("click", ".createp", function(e) {
   )}
 )
 
-$(document).on("click", ".create", function(e) {
+// $(document).on("click", ".create", function(e) {
     
-    e.preventDefault();
-    // console.log(e.target.val)
-    var btn = $(this);
-    // debugger
-    $.ajax({
-      type : 'get',
-      url: btn.attr("data-url"),
-      dataType:"html",
-      // data : {
-      //   objid: $(this).val(),
-      //   action: "get"
-      // },
-      // beforeSend :function(){
-      //   $('#Modalupdate').modal("show");
-      // },
-      success: function(data){
+//     e.preventDefault();
+//     // console.log(e.target.val)
+//     var btn = $(this);
+//     // debugger
+//     $.ajax({
+//       type : 'get',
+//       url: btn.attr("data-url"),
+//       dataType:"html",
+//       // data : {
+//       //   objid: $(this).val(),
+//       //   action: "get"
+//       // },
+//       // beforeSend :function(){
+//       //   $('#Modalupdate').modal("show");
+//       // },
+//       success: function(data){
         
-        // console.log(json);  
-        $(".modal-body").html(data) 
-      },
-     }
-  )}
-)
+//         // console.log(json);  
+//         $(".modal-body").html(data) 
+//       },
+//      }
+//   )}
+// )
 </script>
 {% endblock script%}

@@ -4,10 +4,11 @@ from django.views.generic import CreateView,View,ListView,UpdateView,DeleteView,
 from django.urls import reverse_lazy,reverse    
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.views import PasswordChangeView,PasswordResetDoneView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .forms import User_Post_Creation,User_Profile_Creation,UserUpdateForm,ProfileUpdateForm,CommentForm
+from .forms import User_Post_Creation,User_Profile_Creation,ProfileUpdateForm,CommentForm
 from .models import Create_Post,Profile,Comment
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -58,7 +59,7 @@ class LogIn(View):
 class sign_up(CreateView):
     form_class = Sign_Up_Form
     template_name = 'myapp/registration.html' 
-    success_url = reverse_lazy('login')  
+    success_url = reverse_lazy('login')
 
 
 
@@ -131,41 +132,64 @@ class Detail_Post(LoginRequiredMixin,DetailView):
     
 
 """Add comment on the post of detail page"""
+# @login_required
+# def comment(request, pk):
+#     print(request)
+#     import pdb;pdb.set_trace()
+#     post = get_object_or_404(Create_Post, pk=pk)
+#     if request.method == 'POST':
+#         form = CommentForm(request.POST)
+#         # print(request.POST)
+#         if form.is_valid():
+#             form.instance.name = request.user
+#             comment = form.save(commit=False)
+#             comment.post = post
+#             comment.save()
+#             return redirect('detailpost', pk=post.pk)
+#     else:
+#         form = CommentForm()
+#     return render(request, 'myapp/detail_post.html', {'form': form})
 @login_required
-def comment(request, pk):
-    print(request)
-    import pdb;pdb.set_trace()
-    post = get_object_or_404(Create_Post, pk=pk)
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        # print(request.POST)
-        if form.is_valid():
-            form.instance.name = request.user
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.save()
-            return redirect('detailpost', pk=post.pk)
-    else:
-        form = CommentForm()
-    return render(request, 'myapp/detail_post.html', {'form': form})
+def comment_create(request):
 
+        data = json.loads(request.body)
+        print("recived data:-",data)
+        post_id = data['post_id']
+        comment_body = data['body']
+        # print(data)
+        post = get_object_or_404(Create_Post, id=post_id)
+        comment = Comment.objects.create(
+            name=request.user, 
+            body=comment_body, 
+            post=post
+        )
 
-"""Add comment on the posts of Home page"""  
+        """for get all objects/post comments"""
+        # com_val = Comment.objects.values()
+        # com_data_all = list(com_val)
+        # print(com_data_all)
+
+        """for get particular objects/post comments"""
+        com_val = Comment.objects.filter(post_id = post_id).select_related('name')
+        com_data_particular = list(com_val.values('id','body','date','name__username'))
+        # print(com_data_particular)
+        
+        return JsonResponse({ 
+            # 'body': comment.body,
+            'com_data_particular' : com_data_particular
+            })
+
 @login_required
-def AddCommentHome(request, pk):
-    post = get_object_or_404(Create_Post, pk=pk)
+def Delete_Comment(request):
     if request.method == 'POST':
-        form = CommentForm(request.POST)
-        # print(request.POST)
-        if form.is_valid():
-            form.instance.name = request.user
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.save()
-            return redirect('home')
+        id = request.POST.get('cid')
+        comm = Comment.objects.get(pk=id)   
+        print(comm)
+        comm.delete()
+        return JsonResponse({"status":1})
     else:
-        form = CommentForm()
-    return render(request, 'myapp/home.html', {'form': form})
+        return JsonResponse({"status":0})
+
 
 
 
@@ -187,7 +211,6 @@ class Create_Profile(LoginRequiredMixin,CreateView):
     form_class = User_Profile_Creation 
     model = Profile
     success_url = reverse_lazy('profile')
-
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -242,7 +265,7 @@ class MyPost(ListView):
 class UpdatePost(UpdateView):
     # import pdb;pdb.set_trace()
     model = Create_Post
-    fields = ["post_img","caption"]
+    fields = ["caption"]
     template_name = 'myapp/update_post.html'
     success_url = reverse_lazy('mypost')
 
@@ -274,4 +297,12 @@ class Logout(View):
     def get(self,request):
         logout(request)
         return redirect('home')
+    
+
+class MyPasswordChangeView(LoginRequiredMixin,PasswordChangeView):
+    template_name = "myapp/password-change.html"
+    success_url = reverse_lazy("password-change-done-view")
+
+class MyPasswordResetDoneView(LoginRequiredMixin,PasswordResetDoneView):
+    template_name = "myapp/password-reset-done.html"
     
