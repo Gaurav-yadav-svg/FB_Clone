@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 import json
 from django.utils import timezone
+from django.core.mail import EmailMessage
 # Create your views here.
 
 
@@ -303,6 +304,7 @@ class MyPasswordChangeView(LoginRequiredMixin,PasswordChangeView):
     template_name = "myapp/password-change.html"
     success_url = reverse_lazy("password-change-done-view")
 
-class MyPasswordResetDoneView(LoginRequiredMixin,PasswordResetDoneView):
+class MyPasswordResetDoneView(PasswordResetDoneView):
     template_name = "myapp/password-reset-done.html"
     
+

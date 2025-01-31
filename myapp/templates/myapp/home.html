@@ -67,7 +67,7 @@
           
           
           <p style="display: flex; justify-content: center; font-weight: 450;">Comments</p> 
-          <div id="comment-list">
+          <!-- <div id="comment-list">
             {% for comment in post.comments.all %}
               <div class="comment">
                 <p class="info{{post.id}}" style="display: flex; justify-content: left; padding-left:80px;">
@@ -83,16 +83,36 @@
               </div>
             
             {% endfor %}
-          </div>
+          </div> -->
 
 
         
+        {% for comment in post.comments.all %}
+          <div class="comment">
+            <p class="info{{post.id}}" style="display: flex; justify-content: left; padding-left:80px;">
+              Comment by {{ comment.name }}
+              {{ comment.date }}
+            </p>
+            <small class="small{{post.id}}" style="display: flex; justify-content: space-between ; padding:0px 100px 0px 80px;">
+              {{ comment.body|linebreaks }}
+              {% if user == comment.name %}
+                <p style="color: red; cursor: pointer;" class="delete-comment" data-comid = {{comment.id}}>delete</p>
+              {% endif %}
+            </small>
+          </div>
+        
+        {% endfor %}
+
 
         <div class="post" data-post-id="{{ post.id }}">
+         
           <div class="comment-list" id="comment-list-{{ post.id }}">
             <!-- Comments will be loaded here -->
+             
           </div>
-          <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:133px; margin-top: 25px;">Add comment</small>  
+          <small style="font-weight: bold; font-size: 15px; display: flex; justify-content: left; padding-left:133px; margin-top: 25px;">Add comment
+
+          </small>  
           <form action="{% url 'comm' %}" class="comment-form">
 
             {{ form.as_p}}
@@ -114,6 +134,7 @@
 
 <script>
 
+
   function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -130,59 +151,52 @@
         return cookieValue;
     }
 
-  // comment add ajax code
+// comment add ajax code
 
   $(document).on('click', '.submit-comment', function (e) {
-  e.preventDefault();
-  // var comid = $('#comment-list')
-  var url = $('.comment-form').attr("action");
-  let postElement = $(this).closest('.post');
-  let postId = postElement.data('post-id');
-  let commentBody = postElement.find('#id_body').val();
-  const csrftoken = getCookie('csrftoken');
+        e.preventDefault();
 
-  console.log("url:-",url)
-  console.log("postElement:-",postElement)
-  console.log("commentBody:-",commentBody)
-  console.log(postId);
-
-
-  $.ajax({
-      method: "POST",
-      url: url, 
-      headers: { 'X-CsrfToken': csrftoken },
-      data: JSON.stringify({ post_id: postId, body: commentBody }),
-      success: function (data) {
-          let comments = data.com_data_particular;
-         
-          postElement.find('#id_body').val('');
-          
-          let commentList = postElement.find('.comment-list');
-          commentList.html('');
-          comments.forEach(comment => {
-            let commentHTML = `
-            <div class="comment">
-              <p class="info" style="display: flex; justify-content: left; padding-left:80px;">Comment by ${comment.name__username} on ${new Date(comment.date).toLocaleString()}</p>
-              <small style="display: flex; justify-content: space-between ; padding:0px 100px 0px 80px;">
-                ${ comment.body}
-                
-                
-                <p style="color: red; cursor: pointer;" class="delete-comment" data-comid = ${comment.id}>delete</p>
-                </small>
-                </div>
+        var url = $('.comment-form').attr("action");
+        let postElement = $(this).closest('.post');
+        let postId = postElement.data('post-id');
+        let commentBody = postElement.find('#id_body').val();
+        const csrftoken = getCookie('csrftoken');
+ 
+        $.ajax({
+            method: "POST",
+            url: url, 
+            headers: { 'X-CsrfToken': csrftoken },
+            data: JSON.stringify({ post_id: postId, body: commentBody }),
+    
+          success: function (data) {
+            let comments = data.com_data_particular;
+            postElement.find('#id_body').val('');
+            let commentList = postElement.find(`#comment-list-${postId}`);
+            
+            commentList.html(''); // :white_tick: Purane comments clear karo
+            
+            
+            comments.forEach(comment => {
+                let commentHTML = `
+                    <div class="comment">
+                        <p class="info">Comment by ${comment.name__username} on ${new Date(comment.date).toLocaleString()}</p>
+                        <small>
+                            ${comment.body}
+                            ${comment.name__username === "{{ user.username }}" ? `<p class="delete-comment" data-comid="${comment.id}" style="color: red; cursor: pointer;">delete</p>` : ''}
+                        </small>
+                    </div>
                 `;
                 commentList.append(commentHTML);
-              // comid.append(commentHTML)
-
-          });
-      },
-      error: function (xhr, errmsg, err) {
-          console.log("Error:", errmsg);
-      }
-  });
+              });
+            },
+              error: function (xhr, errmsg, err) {
+                  console.log("Error:", errmsg);
+              }
+        });
 });
 
 
+// like dislike ajax code
 
   $(document).on("click", ".like-button", function (e) {
     e.preventDefault();
@@ -218,6 +232,7 @@
 
 
 
+// ajax create post code
 
   $(document).on("click", ".create", function(e) {
     
@@ -272,61 +287,5 @@
       })
     });
 
-     
-
-
 </script>
 {% endblock script%}
-
-
-
-
-<!-- <div class="post" data-post-id="{{ post.id }}">
-  <div class="comment-list" id="comment-list-{{ post.id }}">
-    Comments will be loaded here
-  </div>
-  <textarea class="comment-body"></textarea>
-  <button class="submit-comment">Comment</button>
-  
-</div> -->
-
-
-<script>
-// Add comment via AJAX
-// $(document).on('click', '.submit-comment', function (e) {
-//   e.preventDefault();
-//   // Get the post ID and comment body dynamically
-//   let postElement = $(this).closest('.post');
-//   let postId = postElement.data('post-id');
-//   let commentBody = postElement.find('.comment-body').val();
-//   const csrftoken = getCookie('csrftoken');
-//   $.ajax({
-//       method: "POST",
-//       url: "/add-comment/", // Replace with your actual URL
-//       headers: { 'X-CsrfToken': csrftoken },
-//       data: JSON.stringify({ post_id: postId, body: commentBody }),
-//       success: function (data) {
-//           let comments = data.com_data_particular;
-//           // Clear the comment input field
-//           postElement.find('.comment-body').val('');
-//           // Clear and reload comments for the current post
-//           let commentList = postElement.find('.comment-list');
-//           commentList.html(''); // Clear old comments
-//           comments.forEach(comment => {
-//               let commentHTML = `
-//                   <div class="comment">
-//                       <p>Comment by ${comment.name__username} on ${new Date(comment.date).toLocaleString()}</p>
-//                       <p>${comment.body}</p>
-//                       <p class="delete-comment" style="cursor: pointer; color: red;" data-comid="${comment.id}">Delete</p>
-//                   </div>
-//               `;
-//               commentList.append(commentHTML);
-//           });
-//       },
-//       error: function (xhr, errmsg, err) {
-//           console.log("Error:", errmsg);
-//       }
-//   });
-// });
-
-</script>

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.linkedin_oauth2',
 
     'myapp',
     'bootstrap5',
@@ -213,6 +214,19 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'user',
         ],
+    },
+    "openid_connect": {
+        "APPS": [
+            {
+                "provider_id": "linkedin",
+                "name": "LinkedIn",
+                "client_id": "<insert-id>",
+                "secret": "<insert-secret>",
+                "settings": {
+                    "server_url": "https://www.linkedin.com/oauth",
+                },
+            }
+        ]
     }
 }
 
@@ -221,5 +235,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "gaurav@thoughtwin.com"
-EMAIL_HOST_PASSWORD = "Gaurav@0524"
+EMAIL_HOST_USER = "gy877619@gmail.com"
+EMAIL_HOST_PASSWORD = "mrye fkbl jqxn ekvm"

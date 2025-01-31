@@ -50,3 +50,10 @@ class Comment(models.Model):
   name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_by')
   body = models.TextField()
   date = models.DateTimeField(auto_now_add=True)
+
+# class Reply(models.Model):
+#     comment_name = models.ForeignKey(Comment, on_delete=models.CASCADE,related_name='replies')
+#     reply_body = models.TextField(max_length=500)
+#     reply_user_name = models.ForeignKey(User,on_delete=models.CASCADE)
+#     date_added = models.DateTimeField(auto_now_add=True)
+
